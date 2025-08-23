@@ -39,85 +39,20 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       { status: 400 },
     );
   }
-  const { title, questions } = body;
 
-  const quizId = crypto.randomUUID();
-  const questionRows = questions.map((question) => ({
-    id: crypto.randomUUID(),
-    quiz_id: quizId,
-    question: question.question,
-  }));
-
-  const optionRows = questions.flatMap((question, questionIndex) => {
-    const questionId = questionRows[questionIndex].id;
-    return question.options.map((option) => ({
-      id: crypto.randomUUID(),
-      question_id: questionId,
-      option: option.option,
-      is_correct: option.is_correct,
-    }));
+  const { data: quizId, error } = await supabase.rpc("create_quiz", {
+    quiz_json: body,
   });
 
-  try {
-    const { error: quizError } = await supabase
-      .from("quizzes")
-      .insert(
-        {
-          id: quizId,
-          user_id: user.id,
-          title: title,
-        },
-      );
-
-    if (quizError) {
-      return NextResponse.json(
-        { error: quizError.message },
-        { status: 400 },
-      );
-    }
-
-    const { error: questionsError } = await supabase
-      .from("questions")
-      .insert(questionRows);
-
-    if (questionsError) {
-      await supabase
-        .from("quizzes")
-        .delete()
-        .eq("id", quizId);
-      return NextResponse.json(
-        { error: questionsError.message },
-        { status: 400 },
-      );
-    }
-
-    const { error: optionsError } = await supabase
-      .from("options")
-      .insert(optionRows);
-
-    if (optionsError) {
-      await supabase
-        .from("quizzes")
-        .delete()
-        .eq("id", quizId);
-      return NextResponse.json(
-        { error: optionsError.message },
-        { status: 400 },
-      );
-    }
-
+  if (error) {
     return NextResponse.json(
-      { id: quizId },
-      { status: 201 },
-    );
-  } catch (error) {
-    await supabase
-      .from("quizzes")
-      .delete()
-      .eq("id", quizId);
-    return NextResponse.json(
-      { error: "Unexpected error", details: String(error) },
-      { status: 500 },
+      { error: error.message },
+      { status: 400 },
     );
   }
+
+  return NextResponse.json(
+    { id: quizId },
+    { status: 201 },
+  );
 }
