@@ -1,20 +1,18 @@
-"use client";
-
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Trash2 } from "lucide-react";
-import type { Option } from "./types";
+import type { Option } from "@/components/types";
 
 interface OptionFormProps {
-  value: Option;
-  onChange: (value: Option) => void;
+  option: Option;
+  onChange: (option: Option) => void;
   onDelete: () => void;
   showDelete: boolean;
 }
 
 export function OptionForm({
-  value,
+  option,
   onChange,
   onDelete,
   showDelete,
@@ -22,14 +20,12 @@ export function OptionForm({
   return (
     <div className="flex items-center gap-2">
       <Checkbox
-        checked={value.is_correct}
-        onCheckedChange={(checked) =>
-          onChange({ ...value, is_correct: checked === true })
-        }
+        checked={option.is_correct}
+        onCheckedChange={(checked) => onChange({ ...option, is_correct: checked === true })}
       />
       <Input
-        value={value.option}
-        onChange={(e) => onChange({ ...value, option: e.target.value })}
+        value={option.option}
+        onChange={(e) => onChange({ ...option, option: e.target.value })}
         placeholder="Option"
       />
       {showDelete && (

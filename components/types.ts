@@ -7,3 +7,8 @@ export type Question = {
   question: string;
   options: Option[];
 };
+
+export type Quiz = {
+  title: string;
+  questions: Question[];
+}
