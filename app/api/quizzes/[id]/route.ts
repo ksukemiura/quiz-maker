@@ -6,9 +6,10 @@ import { createClient } from "@/lib/supabase/server";
 
 export async function GET(
   _request: NextRequest,
-  { params }: { params: { id: string } },
+  { params }: { params: Promise<{ id: string }> },
 ): Promise<NextResponse> {
   const supabase = await createClient();
+  const { id } = await params;
 
   const { data, error } = await supabase
     .from("quizzes")
@@ -22,7 +23,7 @@ export async function GET(
         )
       )
     `)
-    .eq("id", params.id)
+    .eq("id", id)
     .single();
 
   if (error) {
