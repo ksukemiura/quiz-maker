@@ -3,21 +3,7 @@ import {
   NextResponse,
 } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-
-type Option = {
-  option: string;
-  is_correct: boolean;
-};
-
-type Question = {
-  question: string;
-  options: Option[];
-};
-
-type Quiz = {
-  title: string;
-  questions: Question[];
-};
+import type { Quiz } from "@/lib/types";
 
 export async function POST(request: NextRequest): Promise<NextResponse> {
   const supabase = await createClient();
