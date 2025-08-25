@@ -8,7 +8,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { QuizForm } from "@/components/quiz-form";
-import { Quiz } from "@/components/types";
+import type { Quiz } from "@/lib/types";
 
 export default function Page() {
   const blankQuiz: Quiz = {

@@ -2,7 +2,7 @@ import { Input } from "@/components/ui/input";
 import { OptionForm } from "@/components/option-form";
 import { Plus, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import type { Question, Option } from "@/components/types";
+import type { Question, Option } from "@/lib/types";
 
 interface QuestionFormProps {
   question: Question;

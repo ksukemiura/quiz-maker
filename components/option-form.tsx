@@ -2,7 +2,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Trash2 } from "lucide-react";
-import type { Option } from "@/components/types";
+import type { Option } from "@/lib/types";
 
 interface OptionFormProps {
   option: Option;

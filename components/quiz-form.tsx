@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { QuestionForm } from "@/components/question-form";
 import { Plus } from "lucide-react";
-import type { Quiz, Question } from "@/components/types";
+import type { Quiz, Question } from "@/lib/types";
 import { useRouter } from "next/navigation";
 
 interface QuizFormProps {
