@@ -5,7 +5,7 @@ import {
 import { createClient } from "@/lib/supabase/server";
 import type { Quiz } from "@/lib/types";
 
-export async function GET(request: NextRequest): Promise<NextResponse> {
+export async function GET(): Promise<NextResponse> {
   const supabase = await createClient();
 
   const { data: { user } } = await supabase.auth.getUser();
