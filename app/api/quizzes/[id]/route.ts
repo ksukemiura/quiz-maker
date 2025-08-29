@@ -16,8 +16,10 @@ export async function GET(
     .select(`
       title,
       questions:questions(
+        id,
         question,
         options:options!options_question_id_fkey(
+          id,
           option,
           is_correct
         )
