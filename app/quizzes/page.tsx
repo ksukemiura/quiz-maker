@@ -1,6 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import {
+  useEffect,
+  useState,
+} from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import {
@@ -8,25 +11,23 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
+  CardFooter,
 } from "@/components/ui/card";
+import type { Database } from "@/database.types";
 
-type QuizListItem = {
-  id: string;
-  title: string;
-  created_at: string;
-};
+type QuizRow = Database["public"]["Tables"]["quizzes"]["Row"];
 
 export default function Page() {
-  const [quizzes, setQuizzes] = useState<QuizListItem[]>([]);
+  const [quizzes, setQuizzes] = useState<QuizRow[]>([]);
 
   useEffect(() => {
     async function loadQuizzes() {
       try {
-        const res = await fetch("/api/quizzes");
-        if (!res.ok) {
-          throw new Error(`Failed to fetch: ${res.status}`);
+        const response = await fetch("/api/quizzes");
+        if (!response.ok) {
+          throw new Error(`Failed to fetch: ${response.status}`);
         }
-        const data = await res.json();
+        const data = await response.json();
         setQuizzes(data.quizzes);
       } catch (error) {
         console.error(error);
@@ -45,14 +46,26 @@ export default function Page() {
       </div>
       <div className="grid gap-4 pt-4">
         {quizzes.map((quiz) => (
-          <Link key={quiz.id} href={`/quizzes/${quiz.id}`} className="block">
-            <Card className="hover:bg-accent transition-colors">
-              <CardHeader>
-                <CardTitle>{quiz.title}</CardTitle>
-                <CardDescription>Created on {new Date(quiz.created_at).toLocaleDateString()}</CardDescription>
-              </CardHeader>
-            </Card>
-          </Link>
+          <Card key={quiz.id} className="transition-colors">
+            <CardHeader>
+              <CardTitle>
+                <Link className="hover:underline" href={`/quizzes/${quiz.id}`}>
+                  {quiz.title}
+                </Link>
+              </CardTitle>
+              <CardDescription>
+                Created on {new Date(quiz.created_at).toLocaleDateString()}
+              </CardDescription>
+            </CardHeader>
+            <CardFooter className="justify-end gap-2">
+              <Button asChild variant="outline">
+                <Link href={`/quizzes/${quiz.id}`}>View</Link>
+              </Button>
+              <Button asChild>
+                <Link href={`/quizzes/${quiz.id}/quiz_sessions/new`}>Start Session</Link>
+              </Button>
+            </CardFooter>
+          </Card>
         ))}
       </div>
     </div>

@@ -1,17 +1,31 @@
 "use client";
 
-import type { Quiz } from "@/lib/types";
 import {
   use,
   useEffect,
   useState,
 } from "react";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import type { Database } from "@/database.types";
+
+type QuizRow = Database["public"]["Tables"]["quizzes"]["Row"];
+type QuestionRow = Database["public"]["Tables"]["questions"]["Row"];
+type OptionRow = Database["public"]["Tables"]["options"]["Row"];
+
+type Question = QuestionRow & {
+  options: OptionRow[];
+};
+
+type Quiz = QuizRow & {
+  questions: Question[];
+};
 
 export default function Page({
   params,
@@ -20,7 +34,10 @@ export default function Page({
 }) {
   const { id } = use(params);
   const [quiz, setQuiz] = useState<Quiz>({
+    created_at: "",
+    id: "",
     title: "",
+    user_id: "",
     questions: [],
   });
 
@@ -42,7 +59,12 @@ export default function Page({
 
   return (
     <div className="mx-auto max-w-3xl p-6">
-      <h1 className="mb-6 text-3xl font-bold">{quiz.title}</h1>
+      <div className="mb-6 flex items-center justify-between gap-4">
+        <h1 className="text-3xl font-bold">{quiz.title}</h1>
+        <Button asChild>
+          <Link href={`/quizzes/${id}/quiz_sessions/new`}>Start Session</Link>
+        </Button>
+      </div>
       <div className="space-y-6">
         {quiz.questions.map((question, questionIndex) => (
           <Card key={questionIndex}>
