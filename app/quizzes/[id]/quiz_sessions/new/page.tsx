@@ -109,7 +109,7 @@ export default function Page({
       }
 
       const data = await response.json();
-      router.push(`/quizzes/${id}/sessions/${data.id}`);
+      router.push(`/quizzes/${id}/quiz_sessions/${data.id}`);
     } catch (error) {
       console.error(error);
     } finally {
