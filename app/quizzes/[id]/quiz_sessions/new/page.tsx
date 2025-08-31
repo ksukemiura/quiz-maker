@@ -15,17 +15,25 @@ import {
 } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
+import type { Database } from "@/database.types";
 
-type QuizWithIds = {
-  title: string;
-  questions: {
-    id: string;
-    question: string;
-    options: {
-      id: string;
-      option: string;
-    }[];
-  }[];
+type Option = Pick<
+  Database["public"]["Tables"]["options"]["Row"],
+  "id" | "option"
+>;
+
+type Question = Pick<
+  Database["public"]["Tables"]["questions"]["Row"],
+  "id" | "question"
+> & {
+  options: Option[];
+};
+
+type Quiz = Pick<
+  Database["public"]["Tables"]["quizzes"]["Row"],
+  "title"
+> & {
+  questions: Question[];
 };
 
 export default function Page({
@@ -36,11 +44,11 @@ export default function Page({
   const { id } = use(params);
   const router = useRouter();
 
-  const blankQuiz: QuizWithIds = {
+  const blankQuiz: Quiz = {
     title: "",
     questions: [],
   };
-  const [quiz, setQuiz] = useState<QuizWithIds>(blankQuiz);
+  const [quiz, setQuiz] = useState<Quiz>(blankQuiz);
   const [selectedOptionIds, setSelectedOptionIds] = useState<Record<string, string[]>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 

@@ -3,7 +3,19 @@ import {
   NextResponse,
 } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import type { Quiz } from "@/lib/types";
+import type { Database } from "@/database.types";
+
+type OptionInsert = Database["public"]["Tables"]["options"]["Insert"];
+type QuestionInsert = Database["public"]["Tables"]["questions"]["Insert"];
+type QuizInsert = Database["public"]["Tables"]["quizzes"]["Insert"];
+
+type Question = QuestionInsert & {
+  options: OptionInsert[];
+}
+
+type Quiz = QuizInsert & {
+  questions: Question[];
+}
 
 export async function GET(): Promise<NextResponse> {
   const supabase = await createClient();
