@@ -15,22 +15,24 @@ import {
 } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
-import type { Database } from "@/database.types";
+import type { Tables } from "@/database.types";
 
 type Option = Pick<
-  Database["public"]["Tables"]["options"]["Row"],
-  "id" | "option"
+  Tables<"options">,
+  "id" |
+  "option"
 >;
 
 type Question = Pick<
-  Database["public"]["Tables"]["questions"]["Row"],
-  "id" | "question"
+  Tables<"questions">,
+  "id" |
+  "question"
 > & {
   options: Option[];
 };
 
 type Quiz = Pick<
-  Database["public"]["Tables"]["quizzes"]["Row"],
+  Tables<"quizzes">,
   "title"
 > & {
   questions: Question[];

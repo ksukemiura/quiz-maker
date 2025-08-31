@@ -3,17 +3,13 @@ import {
   NextResponse,
 } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import type { Database } from "@/database.types";
+import type { TablesInsert } from "@/database.types";
 
-type OptionInsert = Database["public"]["Tables"]["options"]["Insert"];
-type QuestionInsert = Database["public"]["Tables"]["questions"]["Insert"];
-type QuizInsert = Database["public"]["Tables"]["quizzes"]["Insert"];
-
-type Question = QuestionInsert & {
-  options: OptionInsert[];
+type Question = TablesInsert<"questions"> & {
+  options: TablesInsert<"options">[];
 }
 
-type Quiz = QuizInsert & {
+type Quiz = TablesInsert<"quizzes"> & {
   questions: Question[];
 }
 

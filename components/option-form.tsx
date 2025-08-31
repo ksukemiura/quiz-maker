@@ -2,11 +2,12 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Trash2 } from "lucide-react";
-import type { Database } from "@/database.types";
+import type { TablesInsert } from "@/database.types";
 
 type Option = Pick<
-  Database["public"]["Tables"]["options"]["Insert"],
-  "option" | "is_correct"
+  TablesInsert<"options">,
+  "option" |
+  "is_correct"
 >;
 
 interface OptionFormProps {

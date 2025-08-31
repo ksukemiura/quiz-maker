@@ -5,22 +5,23 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { QuestionForm } from "@/components/question-form";
 import { Plus } from "lucide-react";
-import type { Database } from "@/database.types";
+import type { TablesInsert } from "@/database.types";
 
 type Option = Pick<
-  Database["public"]["Tables"]["options"]["Insert"],
-  "option" | "is_correct"
+  TablesInsert<"options">,
+  "option" |
+  "is_correct"
 >;
 
 type Question = Pick<
-  Database["public"]["Tables"]["questions"]["Insert"],
+  TablesInsert<"questions">,
   "question"
 > & {
   options: Option[];
 };
 
 type Quiz = Pick<
-  Database["public"]["Tables"]["quizzes"]["Insert"],
+  TablesInsert<"quizzes">,
   "title"
 > & {
   questions: Question[];

@@ -13,18 +13,17 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import type { Database } from "@/database.types";
-
-type QuizSessionRow = Database["public"]["Tables"]["quiz_sessions"]["Row"];
-type QuizRow = Database["public"]["Tables"]["quizzes"]["Row"];
+import type { Tables } from "@/database.types";
 
 type QuizSession =
   Pick<
-    QuizSessionRow,
-    "id" | "created_at" | "quiz_id"
+    Tables<"quiz_sessions">,
+    "id" |
+    "created_at" |
+    "quiz_id"
   > & {
     quiz: Pick<
-      QuizRow,
+      Tables<"quizzes">,
       "title"
     >;
   };

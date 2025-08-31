@@ -8,22 +8,23 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { QuizForm } from "@/components/quiz-form";
-import type { Database } from "@/database.types";
+import type { TablesInsert } from "@/database.types";
 
 type Option = Pick<
-  Database["public"]["Tables"]["options"]["Insert"],
-  "option" | "is_correct"
+  TablesInsert<"options">,
+  "option" |
+  "is_correct"
 >;
 
 type Question = Pick<
-  Database["public"]["Tables"]["questions"]["Insert"],
+  TablesInsert<"questions">,
   "question"
 > & {
   options: Option[];
 };
 
 type Quiz = Pick<
-  Database["public"]["Tables"]["quizzes"]["Insert"],
+  TablesInsert<"quizzes">,
   "title"
 > & {
   questions: Question[];

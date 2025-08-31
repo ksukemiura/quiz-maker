@@ -3,13 +3,10 @@ import {
   NextResponse,
 } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import type { Database } from "@/database.types";
+import type { TablesInsert } from "@/database.types";
 
-type SelectedOptionInsert = Database["public"]["Tables"]["selected_options"]["Insert"];
-type QuizSessionInsert = Database["public"]["Tables"]["quiz_sessions"]["Insert"];
-
-type QuizSession = QuizSessionInsert & {
-  selected_options: SelectedOptionInsert[];
+type QuizSession = TablesInsert<"quiz_sessions"> & {
+  selected_options: TablesInsert<"selected_options">[];
 }
 
 export async function GET(): Promise<NextResponse> {

@@ -12,20 +12,35 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import type { Database } from "@/database.types";
+import type { Tables } from "@/database.types";
 
-type QuizRow = Database["public"]["Tables"]["quizzes"]["Row"];
-type QuestionRow = Database["public"]["Tables"]["questions"]["Row"];
-type OptionRow = Database["public"]["Tables"]["options"]["Row"];
-type SelectedOptionRow = Database["public"]["Tables"]["selected_options"]["Row"];
+type SelectedOption = Pick<
+  Tables<"selected_options">,
+  "question_id" |
+  "option_id"
+>;
 
-type Question = QuestionRow & {
-  options: OptionRow[];
-}
+type Option = Pick<
+  Tables<"options">,
+  "id" |
+  "option" |
+  "is_correct"
+>;
 
-type Quiz = QuizRow & {
+type Question = Pick<
+  Tables<"questions">,
+  "id" |
+  "question"
+> & {
+  options: Option[];
+};
+
+type Quiz = Pick<
+  Tables<"quizzes">,
+  "title"
+> & {
   questions: Question[];
-}
+};
 
 export default function Page({
   params,
@@ -34,14 +49,8 @@ export default function Page({
 }) {
   const { id, quiz_session_id } = use(params);
 
-  const [quiz, setQuiz] = useState<Quiz>({
-    created_at: "",
-    id: "",
-    title: "",
-    user_id: "",
-    questions: [],
-  });
-  const [selectedOptions, setSelectedOptions] = useState<SelectedOptionRow[]>([]);
+  const [quiz, setQuiz] = useState<Quiz>({ title: "", questions: [] });
+  const [selectedOptions, setSelectedOptions] = useState<SelectedOption[]>([]);
 
   useEffect(() => {
     async function load() {
