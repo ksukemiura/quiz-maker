@@ -128,7 +128,7 @@ export default function Page({
   }
 
   return (
-    <div className="container mx-auto max-w-3xl py-8">
+    <div className="container mx-auto max-w-3xl p-6">
       <h1 className="text-3xl font-bold mb-6">{quiz.title}</h1>
       <div className="space-y-6 pb-4">
         {quiz.questions.map((question, questionIndex) => (

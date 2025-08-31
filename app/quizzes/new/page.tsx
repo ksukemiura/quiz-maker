@@ -45,7 +45,7 @@ export default function Page() {
   });
 
   return (
-    <div className="container mx-auto max-w-2xl py-10">
+    <div className="container mx-auto max-w-2xl p-6">
       <Card>
         <CardHeader>
           <CardTitle>Create New Quiz</CardTitle>
