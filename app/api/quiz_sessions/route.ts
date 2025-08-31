@@ -3,7 +3,52 @@ import {
   NextResponse,
 } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import type { QuizSession } from "@/lib/types";
+import type { Database } from "@/database.types";
+
+type SelectedOptionInsert = Database["public"]["Tables"]["selected_options"]["Insert"];
+type QuizSessionInsert = Database["public"]["Tables"]["quiz_sessions"]["Insert"];
+
+type QuizSession = QuizSessionInsert & {
+  selected_options: SelectedOptionInsert[];
+}
+
+export async function GET(): Promise<NextResponse> {
+  const supabase = await createClient();
+
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) {
+    return NextResponse.json(
+      { error: "Unauthorized" },
+      { status: 401 },
+    );
+  }
+
+  const { data, error } = await supabase
+    .from("quiz_sessions")
+    .select(`
+      id,
+      created_at,
+      quiz_id,
+      quiz:quizzes(
+        id,
+        title
+      )
+    `)
+    .eq("user_id", user.id)
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    return NextResponse.json(
+      { error: error.message },
+      { status: 400 },
+    );
+  }
+
+  return NextResponse.json(
+    { quizSessions: data ?? [] },
+    { status: 200 },
+  );
+}
 
 export async function POST(request: NextRequest): Promise<NextResponse> {
   const supabase = await createClient();
