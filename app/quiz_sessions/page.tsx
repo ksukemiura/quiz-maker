@@ -48,7 +48,7 @@ export default function Page() {
   }, []);
 
   return (
-    <div className="container mx-auto max-w-2xl py-10">
+    <div className="container mx-auto max-w-2xl p-6">
       <div className="mb-8 flex items-center justify-between">
         <h1 className="text-3xl font-bold">Quiz Sessions</h1>
       </div>
