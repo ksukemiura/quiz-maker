@@ -122,7 +122,7 @@ export default function Page({
                   <span>
                     {questionIndex + 1}. {question.question}
                   </span>
-                  <Badge variant={isCorrect ? "default" : "destructive"}>
+                  <Badge variant={isCorrect ? "success" : "destructive"}>
                     {isCorrect ? "+1 point" : "+0 points"}
                   </Badge>
                 </CardTitle>
@@ -141,10 +141,8 @@ export default function Page({
                         {selectedOptionsMap.get(question.id)?.has(option.id) && (
                           <Badge variant="secondary">Selected</Badge>
                         )}
-                        {option.is_correct ? (
-                          <Badge>Correct</Badge>
-                        ) : (
-                          <Badge variant="outline">Not Correct</Badge>
+                        {option.is_correct && (
+                          <Badge variant="success">Correct</Badge>
                         )}
                       </div>
                     </li>
