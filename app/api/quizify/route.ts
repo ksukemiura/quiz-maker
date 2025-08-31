@@ -76,7 +76,7 @@ export async function POST(request: NextRequest) {
 
     const data = JSON.parse(response.candidates?.[0].content?.parts?.[0].text ?? "");
     return NextResponse.json(data, { status: 200 });
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { error: "Failed to parse quiz" },
       { status: 500 },
