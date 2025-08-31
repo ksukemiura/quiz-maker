@@ -8,10 +8,30 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { QuizForm } from "@/components/quiz-form";
-import type { Quiz } from "@/lib/types";
+import type { TablesInsert } from "@/database.types";
+
+type Option = Pick<
+  TablesInsert<"options">,
+  "option" |
+  "is_correct"
+>;
+
+type Question = Pick<
+  TablesInsert<"questions">,
+  "question"
+> & {
+  options: Option[];
+};
+
+type Quiz = Pick<
+  TablesInsert<"quizzes">,
+  "title"
+> & {
+  questions: Question[];
+};
 
 export default function Page() {
-  const blankQuiz: Quiz = {
+  const [quiz, setQuiz] = useState<Quiz>({
     title: "",
     questions: [
       {
@@ -20,10 +40,9 @@ export default function Page() {
           { option: "", is_correct: false },
           { option: "", is_correct: false },
         ],
-      },
+      }
     ],
-  };
-  const [quiz, setQuiz] = useState<Quiz>(blankQuiz);
+  });
 
   return (
     <div className="container mx-auto max-w-2xl py-10">

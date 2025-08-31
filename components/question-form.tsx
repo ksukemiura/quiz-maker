@@ -2,7 +2,20 @@ import { Input } from "@/components/ui/input";
 import { OptionForm } from "@/components/option-form";
 import { Plus, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import type { Question, Option } from "@/lib/types";
+import type { TablesInsert } from "@/database.types";
+
+type Option = Pick<
+  TablesInsert<"options">,
+  "option" |
+  "is_correct"
+>;
+
+type Question = Pick<
+  TablesInsert<"questions">,
+  "question"
+> & {
+  options: Option[];
+};
 
 interface QuestionFormProps {
   question: Question;

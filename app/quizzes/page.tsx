@@ -13,12 +13,17 @@ import {
   CardTitle,
   CardFooter,
 } from "@/components/ui/card";
-import type { Database } from "@/database.types";
+import type { Tables } from "@/database.types";
 
-type QuizRow = Database["public"]["Tables"]["quizzes"]["Row"];
+type Quiz = Pick<
+  Tables<"quizzes">,
+  "id" |
+  "title" |
+  "created_at"
+>;
 
 export default function Page() {
-  const [quizzes, setQuizzes] = useState<QuizRow[]>([]);
+  const [quizzes, setQuizzes] = useState<Quiz[]>([]);
 
   useEffect(() => {
     async function loadQuizzes() {

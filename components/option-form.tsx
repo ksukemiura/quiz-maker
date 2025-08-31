@@ -2,7 +2,13 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Trash2 } from "lucide-react";
-import type { Option } from "@/lib/types";
+import type { TablesInsert } from "@/database.types";
+
+type Option = Pick<
+  TablesInsert<"options">,
+  "option" |
+  "is_correct"
+>;
 
 interface OptionFormProps {
   option: Option;

@@ -1,11 +1,31 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { QuestionForm } from "@/components/question-form";
 import { Plus } from "lucide-react";
-import type { Quiz, Question } from "@/lib/types";
-import { useRouter } from "next/navigation";
+import type { TablesInsert } from "@/database.types";
+
+type Option = Pick<
+  TablesInsert<"options">,
+  "option" |
+  "is_correct"
+>;
+
+type Question = Pick<
+  TablesInsert<"questions">,
+  "question"
+> & {
+  options: Option[];
+};
+
+type Quiz = Pick<
+  TablesInsert<"quizzes">,
+  "title"
+> & {
+  questions: Question[];
+};
 
 interface QuizFormProps {
   quiz: Quiz;

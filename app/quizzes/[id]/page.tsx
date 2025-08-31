@@ -13,17 +13,24 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import type { Database } from "@/database.types";
+import type { Tables } from "@/database.types";
 
-type QuizRow = Database["public"]["Tables"]["quizzes"]["Row"];
-type QuestionRow = Database["public"]["Tables"]["questions"]["Row"];
-type OptionRow = Database["public"]["Tables"]["options"]["Row"];
+type Option = Pick<
+  Tables<"options">,
+  "option"
+>;
 
-type Question = QuestionRow & {
-  options: OptionRow[];
+type Question = Pick<
+  Tables<"questions">,
+  "question"
+> & {
+  options: Option[];
 };
 
-type Quiz = QuizRow & {
+type Quiz = Pick<
+  Tables<"quizzes">,
+  "title"
+> & {
   questions: Question[];
 };
 
@@ -33,13 +40,7 @@ export default function Page({
   params: Promise<{ id: string }>;
 }) {
   const { id } = use(params);
-  const [quiz, setQuiz] = useState<Quiz>({
-    created_at: "",
-    id: "",
-    title: "",
-    user_id: "",
-    questions: [],
-  });
+  const [quiz, setQuiz] = useState<Quiz>({ title: "", questions: [] });
 
   useEffect(() => {
     async function loadQuiz() {
