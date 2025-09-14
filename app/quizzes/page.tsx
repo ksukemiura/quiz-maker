@@ -45,9 +45,6 @@ export default function Page() {
     <div className="container mx-auto max-w-2xl p-6">
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-3xl font-bold">Quizzes</h1>
-        <Button>
-          <Link href="/quizzes/new">New Quiz</Link>
-        </Button>
       </div>
       <div className="grid gap-4 pt-4">
         {quizzes.map((quiz) => (
@@ -67,7 +64,7 @@ export default function Page() {
                 <Link href={`/quizzes/${quiz.id}`}>View</Link>
               </Button>
               <Button asChild>
-                <Link href={`/quizzes/${quiz.id}/quiz_sessions/new`}>Start Session</Link>
+                <Link href={`/quizzes/${quiz.id}/quiz_sessions/new`}>Start Quiz</Link>
               </Button>
             </CardFooter>
           </Card>

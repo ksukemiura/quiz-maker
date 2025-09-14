@@ -45,14 +45,6 @@ export default function Page() {
     <div className="container mx-auto max-w-2xl p-6">
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-3xl font-bold">Quizzes</h1>
-        <div className="flex gap-2">
-          <Button>
-            <Link href="/quizify">New Quiz</Link>
-          </Button>
-          <Button>
-            <Link href="/quiz_sessions">Review</Link>
-          </Button>
-        </div>
       </div>
       <div className="grid gap-4 pt-4">
         {quizzes.map((quiz) => (
