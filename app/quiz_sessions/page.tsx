@@ -50,7 +50,7 @@ export default function Page() {
   return (
     <div className="container mx-auto max-w-2xl p-6">
       <div className="mb-8 flex items-center justify-between">
-        <h1 className="text-3xl font-bold">Quiz Sessions</h1>
+        <h1 className="text-3xl font-bold">Quiz Results</h1>
       </div>
       <div className="grid gap-4">
         {quizSessions.map((quizSession) => (
@@ -64,9 +64,6 @@ export default function Page() {
               </CardDescription>
             </CardHeader>
             <CardFooter className="justify-end gap-2">
-              <Button asChild variant="outline">
-                <Link href={`/quizzes/${quizSession.quiz_id}`}>View Quiz</Link>
-              </Button>
               <Button asChild>
                 <Link href={`/quizzes/${quizSession.quiz_id}/quiz_sessions/${quizSession.id}`}>View Result</Link>
               </Button>

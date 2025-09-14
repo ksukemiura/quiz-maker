@@ -63,7 +63,7 @@ export default function Page({
       <div className="mb-6 flex items-center justify-between gap-4">
         <h1 className="text-3xl font-bold">{quiz.title}</h1>
         <Button asChild>
-          <Link href={`/quizzes/${id}/quiz_sessions/new`}>Start Session</Link>
+          <Link href={`/quizzes/${id}/quiz_sessions/new`}>Start Quiz</Link>
         </Button>
       </div>
       <div className="space-y-6">
