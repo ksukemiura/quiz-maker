@@ -12,6 +12,8 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { useRouter } from "next/navigation";
 import type { Tables } from "@/database.types";
 import MathText from "@/components/MathText";
 
@@ -49,6 +51,7 @@ export default function Page({
   params: Promise<{ id: string; quiz_session_id: string }>;
 }) {
   const { id, quiz_session_id } = use(params);
+  const router = useRouter();
 
   const [quiz, setQuiz] = useState<Quiz>({ title: "", questions: [] });
   const [selectedOptions, setSelectedOptions] = useState<SelectedOption[]>([]);
@@ -102,14 +105,64 @@ export default function Page({
     }
   }
 
+  const hasIncorrect = quiz.questions.length > correctQuestionIds.size;
+  const [isCreating, setIsCreating] = useState(false);
+
+  async function handleCreateQuizFromIncorrect() {
+    if (!hasIncorrect) {
+      return;
+    }
+    setIsCreating(true);
+
+    try {
+      const incorrectQuestions = quiz.questions.filter((question) => !correctQuestionIds.has(question.id));
+      if (incorrectQuestions.length === 0) {
+        return;
+      }
+
+      const newQuiz = {
+        title: `${quiz.title} — Retry`,
+        questions: incorrectQuestions.map((question) => ({
+          question: question.question,
+          options: question.options.map((option) => ({
+            option: option.option,
+            is_correct: option.is_correct,
+          })),
+        })),
+      };
+
+      const response = await fetch("/api/quizzes", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(newQuiz),
+      });
+
+      if (!response.ok) {
+        const data = await response.json().catch(() => ({}));
+        throw new Error(data?.error || `Failed to create quiz: ${response.status}`);
+      }
+
+      const { id: newQuizId } = await response.json();
+      router.push(`/quizzes/${newQuizId}/quiz_sessions/new`);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsCreating(false);
+    }
+  }
+
   return (
     <div className="container mx-auto max-w-3xl p-6">
-      <div className="mb-6">
-        <h1 className="text-3xl font-bold">Results</h1>
-        <p className="mt-1 text-muted-foreground"><MathText text={quiz.title} /></p>
+      <div className="mb-6 flex items-center justify-between gap-4">
+        <h1 className="text-3xl font-bold"><MathText text={quiz.title} /></h1>
         <div className="mt-3 text-lg font-medium">
           Score: {score} / {quiz.questions.length}
         </div>
+        {hasIncorrect && (
+          <Button onClick={handleCreateQuizFromIncorrect} disabled={isCreating}>
+            {isCreating ? "Preparing…" : "Retry"}
+          </Button>
+        )}
       </div>
 
       <div className="space-y-6">
