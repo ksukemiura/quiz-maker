@@ -13,6 +13,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import type { Tables } from "@/database.types";
+import MathText from "@/components/MathText";
 
 type SelectedOption = Pick<
   Tables<"selected_options">,
@@ -105,7 +106,7 @@ export default function Page({
     <div className="container mx-auto max-w-3xl p-6">
       <div className="mb-6">
         <h1 className="text-3xl font-bold">Results</h1>
-        <p className="mt-1 text-muted-foreground">{quiz.title}</p>
+        <p className="mt-1 text-muted-foreground"><MathText text={quiz.title} /></p>
         <div className="mt-3 text-lg font-medium">
           Score: {score} / {quiz.questions.length}
         </div>
@@ -119,8 +120,9 @@ export default function Page({
             <Card key={question.id}>
               <CardHeader>
                 <CardTitle className="text-xl flex items-center justify-between">
-                  <span>
-                    {questionIndex + 1}. {question.question}
+                  <span className="flex-1">
+                    <span className="mr-2">{questionIndex + 1}.</span>
+                    <MathText text={question.question} />
                   </span>
                   <Badge variant={isCorrect ? "success" : "destructive"}>
                     {isCorrect ? "+1 point" : "+0 points"}
@@ -135,7 +137,7 @@ export default function Page({
                       className="flex items-center justify-between rounded-md border p-3"
                     >
                       <div className="flex items-center gap-3">
-                        <span>{option.option}</span>
+                        <span><MathText text={option.option} /></span>
                       </div>
                       <div className="flex items-center gap-2">
                         {selectedOptionsMap.get(question.id)?.has(option.id) && (

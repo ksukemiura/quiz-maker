@@ -16,6 +16,7 @@ import {
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import type { Tables } from "@/database.types";
+import MathText from "@/components/MathText";
 
 type Option = Pick<
   Tables<"options">,
@@ -129,13 +130,14 @@ export default function Page({
 
   return (
     <div className="container mx-auto max-w-3xl p-6">
-      <h1 className="text-3xl font-bold mb-6">{quiz.title}</h1>
+      <h1 className="text-3xl font-bold mb-6"><MathText text={quiz.title} /></h1>
       <div className="space-y-6 pb-4">
         {quiz.questions.map((question, questionIndex) => (
           <Card key={question.id}>
             <CardHeader>
               <CardTitle className="text-xl">
-                {questionIndex + 1}. {question.question}
+                <span className="mr-2">{questionIndex + 1}.</span>
+                <MathText text={question.question} />
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -151,7 +153,7 @@ export default function Page({
                         }
                       />
                       <Label htmlFor={option.id} className="cursor-pointer">
-                        {option.option}
+                        <MathText text={option.option} />
                       </Label>
                     </div>
                   );

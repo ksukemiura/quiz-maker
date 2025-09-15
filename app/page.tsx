@@ -14,6 +14,7 @@ import {
   CardFooter,
 } from "@/components/ui/card";
 import type { Tables } from "@/database.types";
+import MathText from "@/components/MathText";
 
 type Quiz = Pick<
   Tables<"quizzes">,
@@ -52,7 +53,7 @@ export default function Page() {
             <CardHeader>
               <CardTitle>
                 <Link className="hover:underline" href={`/quizzes/${quiz.id}`}>
-                  {quiz.title}
+                  <MathText text={quiz.title} />
                 </Link>
               </CardTitle>
               <CardDescription>

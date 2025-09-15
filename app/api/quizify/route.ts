@@ -59,6 +59,7 @@ export async function POST(request: NextRequest) {
       "- Indices shown in the input are 1-based.",
       "- Set `is_correct: true` where the option index appears in the 'Correct option index/indices'.",
       "- Do not invent options or questions; copy text verbatim (except trimming whitespace).",
+      "- For math formulas, use syntax compatible with KaTeX.",
       title ? `- Use this title: ${title}` : `- Set a short descriptive title.`,
       "",
       "INPUT TEXT:",
