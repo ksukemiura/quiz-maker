@@ -14,6 +14,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import type { Tables } from "@/database.types";
+import MathText from "@/components/MathText";
 
 type Option = Pick<
   Tables<"options">,
@@ -61,7 +62,7 @@ export default function Page({
   return (
     <div className="mx-auto max-w-3xl p-6">
       <div className="mb-6 flex items-center justify-between gap-4">
-        <h1 className="text-3xl font-bold">{quiz.title}</h1>
+        <h1 className="text-3xl font-bold"><MathText text={quiz.title} /></h1>
         <Button asChild>
           <Link href={`/quizzes/${id}/quiz_sessions/new`}>Start Quiz</Link>
         </Button>
@@ -71,7 +72,8 @@ export default function Page({
           <Card key={questionIndex}>
             <CardHeader>
               <CardTitle className="text-xl">
-                {questionIndex + 1}. {question.question}
+                <span className="mr-2">{questionIndex + 1}.</span>
+                <MathText text={question.question} />
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -81,7 +83,7 @@ export default function Page({
                     <span className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-gray-100 text-sm font-medium text-gray-700">
                       {optionIndex + 1}
                     </span>
-                    <span>{option.option}</span>
+                    <span><MathText text={option.option} /></span>
                   </li>
                 ))}
               </ul>
