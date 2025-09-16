@@ -34,8 +34,9 @@ type Quiz = Pick<Tables<"quizzes">, "title"> & {
 export default async function Page({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
+  const { id } = await params;
   const supabase = await createClient();
   const {
     data: { user },
@@ -59,7 +60,7 @@ export default async function Page({
          )
        )`,
     )
-    .eq("id", params.id)
+    .eq("id", id)
     .eq("user_id", user.id)
     .single();
 
@@ -84,7 +85,7 @@ export default async function Page({
           <MathText text={quiz.title} />
         </h1>
         <Button asChild>
-          <Link href={`/quizzes/${params.id}/quiz_sessions/new`}>
+          <Link href={`/quizzes/${id}/quiz_sessions/new`}>
             Start Quiz
           </Link>
         </Button>

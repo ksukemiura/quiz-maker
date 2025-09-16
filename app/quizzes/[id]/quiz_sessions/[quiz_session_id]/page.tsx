@@ -32,8 +32,9 @@ type SelectedOption = Pick<
 export default async function Page({
   params,
 }: {
-  params: { id: string; quiz_session_id: string };
+  params: Promise<{ id: string; quiz_session_id: string }>;
 }) {
+  const { id, quiz_session_id } = await params;
   const supabase = await createClient();
 
   const {
@@ -59,11 +60,11 @@ export default async function Page({
            )
          )`,
       )
-      .eq("id", params.id)
-      .eq("user_id", user.id)
-      .single(),
-    supabase
-      .from("quiz_sessions")
+    .eq("id", id)
+    .eq("user_id", user.id)
+    .single(),
+  supabase
+    .from("quiz_sessions")
       .select(
         `id,
          quiz_id,
@@ -72,8 +73,8 @@ export default async function Page({
            option_id
          )`,
       )
-      .eq("id", params.quiz_session_id)
-      .eq("quiz_id", params.id)
+      .eq("id", quiz_session_id)
+      .eq("quiz_id", id)
       .eq("user_id", user.id)
       .single(),
   ]);
