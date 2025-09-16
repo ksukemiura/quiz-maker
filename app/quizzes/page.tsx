@@ -2,6 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 
 import { createClient } from "@/lib/supabase/server";
+import StartQuizButton from "@/components/start-quiz-button";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -64,11 +65,9 @@ export default async function Page() {
               <Button asChild variant="outline">
                 <Link href={`/quizzes/${quiz.id}`}>View</Link>
               </Button>
-              <Button asChild>
-                <Link href={`/quizzes/${quiz.id}/quiz_sessions/new`}>
-                  Start Quiz
-                </Link>
-              </Button>
+              <StartQuizButton href={`/quizzes/${quiz.id}/quiz_sessions/new`}>
+                Start Quiz
+              </StartQuizButton>
             </CardFooter>
           </Card>
         ))}
