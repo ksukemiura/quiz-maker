@@ -8,15 +8,21 @@ export default function QuizifyPage() {
 
   const [title, setTitle] = useState("");
   const [text, setText] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+
+    if (isSubmitting) {
+      return;
+    }
 
     if (!text.trim()) {
       return;
     }
 
     try {
+      setIsSubmitting(true);
       const quiz = await fetch("/api/quizify", {
         method: "POST",
         headers: {
@@ -53,6 +59,7 @@ export default function QuizifyPage() {
       router.push(`/quizzes/${quizId}`);
     } catch (error) {
       console.error(error);
+      setIsSubmitting(false);
     }
   }
 
@@ -93,9 +100,10 @@ export default function QuizifyPage() {
 
         <button
           type="submit"
-          className="rounded-lg bg-black px-4 py-2 text-white"
+          className="rounded-lg bg-black px-4 py-2 text-white disabled:cursor-not-allowed disabled:opacity-60"
+          disabled={isSubmitting}
         >
-          Create
+          {isSubmitting ? "Creating..." : "Create"}
         </button>
       </form>
     </div>

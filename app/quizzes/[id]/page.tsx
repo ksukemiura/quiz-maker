@@ -1,8 +1,7 @@
-import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 
 import MathText from "@/components/MathText";
-import { Button } from "@/components/ui/button";
+import StartQuizButton from "@/components/start-quiz-button";
 import {
   Card,
   CardContent,
@@ -84,11 +83,9 @@ export default async function Page({
         <h1 className="text-3xl font-bold">
           <MathText text={quiz.title} />
         </h1>
-        <Button asChild>
-          <Link href={`/quizzes/${id}/quiz_sessions/new`}>
-            Start Quiz
-          </Link>
-        </Button>
+        <StartQuizButton href={`/quizzes/${id}/quiz_sessions/new`}>
+          Start Quiz
+        </StartQuizButton>
       </div>
       <div className="space-y-6">
         {quiz.questions.map((question, questionIndex) => (
