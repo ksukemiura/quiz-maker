@@ -1,17 +1,14 @@
-"use client";
-
-import {
-  useEffect,
-  useState,
-} from "react";
 import Link from "next/link";
+import { redirect } from "next/navigation";
+
+import { createClient } from "@/lib/supabase/server";
 import { Button } from "@/components/ui/button";
 import {
   Card,
   CardDescription,
+  CardFooter,
   CardHeader,
   CardTitle,
-  CardFooter,
 } from "@/components/ui/card";
 import type { Tables } from "@/database.types";
 
@@ -22,28 +19,32 @@ type Quiz = Pick<
   "created_at"
 >;
 
-export default function Page() {
-  const [quizzes, setQuizzes] = useState<Quiz[]>([]);
+export default async function Page() {
+  const supabase = await createClient();
 
-  useEffect(() => {
-    async function loadQuizzes() {
-      try {
-        const response = await fetch("/api/quizzes");
-        if (!response.ok) {
-          throw new Error(`Failed to fetch: ${response.status}`);
-        }
-        const data = await response.json();
-        setQuizzes(data.quizzes);
-      } catch (error) {
-        console.error(error);
-      }
-    }
-    loadQuizzes();
-  }, []);
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    redirect("/auth/login");
+  }
+
+  const { data, error } = await supabase
+    .from("quizzes")
+    .select("id, title, created_at")
+    .eq("user_id", user.id)
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  const quizzes = (data ?? []) as Quiz[];
 
   return (
     <div className="container mx-auto max-w-2xl p-6">
-      <div className="flex justify-between items-center mb-8">
+      <div className="mb-8 flex items-center justify-between">
         <h1 className="text-3xl font-bold">Quizzes</h1>
       </div>
       <div className="grid gap-4 pt-4">
@@ -64,7 +65,9 @@ export default function Page() {
                 <Link href={`/quizzes/${quiz.id}`}>View</Link>
               </Button>
               <Button asChild>
-                <Link href={`/quizzes/${quiz.id}/quiz_sessions/new`}>Start Quiz</Link>
+                <Link href={`/quizzes/${quiz.id}/quiz_sessions/new`}>
+                  Start Quiz
+                </Link>
               </Button>
             </CardFooter>
           </Card>

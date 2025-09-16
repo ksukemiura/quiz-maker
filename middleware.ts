@@ -15,6 +15,7 @@ export const config = {
   matcher: [
     /*
      * Match all request paths except:
+     * - api routes (handled directly by route handlers)
      * - _next/static (static files)
      * - _next/image (image optimization files)
      * - favicon.ico (favicon file)

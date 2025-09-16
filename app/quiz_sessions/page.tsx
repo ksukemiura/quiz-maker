@@ -1,10 +1,7 @@
-"use client";
-
-import {
-  useEffect,
-  useState,
-} from "react";
 import Link from "next/link";
+import { redirect } from "next/navigation";
+
+import { createClient } from "@/lib/supabase/server";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -22,30 +19,34 @@ type QuizSession =
     "created_at" |
     "quiz_id"
   > & {
-    quiz: Pick<
-      Tables<"quizzes">,
-      "title"
-    >;
+    quiz: Pick<Tables<"quizzes">, "title"> | null;
   };
 
-export default function Page() {
-  const [quizSessions, setQuizSessions] = useState<QuizSession[]>([]);
+export default async function Page() {
+  const supabase = await createClient();
 
-  useEffect(() => {
-    async function loadQuizSessions() {
-      try {
-        const response = await fetch("/api/quiz_sessions");
-        if (!response.ok) {
-          throw new Error(`Failed to fetch: ${response.status}`);
-        }
-        const data = await response.json();
-        setQuizSessions(data.quizSessions || []);
-      } catch (error) {
-        console.error(error);
-      }
-    }
-    loadQuizSessions();
-  }, []);
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    redirect("/auth/login");
+  }
+
+  const { data, error } = await supabase
+    .from("quiz_sessions")
+    .select(
+      `id, created_at, quiz_id,
+       quiz:quizzes(id, title)`,
+    )
+    .eq("user_id", user.id)
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  const quizSessions = (data ?? []) as QuizSession[];
 
   return (
     <div className="container mx-auto max-w-2xl p-6">
@@ -57,7 +58,7 @@ export default function Page() {
           <Card key={quizSession.id}>
             <CardHeader>
               <CardTitle className="text-xl">
-                {quizSession.quiz.title || "Untitled Quiz"}
+                {quizSession.quiz?.title || "Untitled Quiz"}
               </CardTitle>
               <CardDescription>
                 Taken on {new Date(quizSession.created_at).toLocaleString()}
@@ -65,7 +66,11 @@ export default function Page() {
             </CardHeader>
             <CardFooter className="justify-end gap-2">
               <Button asChild>
-                <Link href={`/quizzes/${quizSession.quiz_id}/quiz_sessions/${quizSession.id}`}>View Result</Link>
+                <Link
+                  href={`/quizzes/${quizSession.quiz_id}/quiz_sessions/${quizSession.id}`}
+                >
+                  View Result
+                </Link>
               </Button>
             </CardFooter>
           </Card>
