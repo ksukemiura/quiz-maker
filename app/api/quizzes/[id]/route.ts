@@ -11,6 +11,17 @@ export async function GET(
   const supabase = await createClient();
   const { id } = await params;
 
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return NextResponse.json(
+      { error: "Unauthorized" },
+      { status: 401 },
+    );
+  }
+
   const { data, error } = await supabase
     .from("quizzes")
     .select(`
@@ -26,6 +37,7 @@ export async function GET(
       )
     `)
     .eq("id", id)
+    .eq("user_id", user.id)
     .single();
 
   if (error) {
