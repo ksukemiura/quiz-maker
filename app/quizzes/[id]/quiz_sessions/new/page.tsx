@@ -1,22 +1,8 @@
-"use client";
+import { notFound, redirect } from "next/navigation";
 
-import {
-  use,
-  useEffect,
-  useState,
-} from "react";
-import { useRouter } from "next/navigation";
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
-import { Checkbox } from "@/components/ui/checkbox";
+import StartQuizSession from "./client-page";
 import type { Tables } from "@/database.types";
-import MathText from "@/components/MathText";
+import { createClient } from "@/lib/supabase/server";
 
 type Option = Pick<
   Tables<"options">,
@@ -32,145 +18,54 @@ type Question = Pick<
   options: Option[];
 };
 
-type Quiz = Pick<
-  Tables<"quizzes">,
-  "title"
-> & {
+type Quiz = Pick<Tables<"quizzes">, "title"> & {
   questions: Question[];
 };
 
-export default function Page({
+export default async function Page({
   params,
 }: {
-  params: Promise<{ id: string }>;
+  params: { id: string };
 }) {
-  const { id } = use(params);
-  const router = useRouter();
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
-  const blankQuiz: Quiz = {
-    title: "",
-    questions: [],
-  };
-  const [quiz, setQuiz] = useState<Quiz>(blankQuiz);
-  const [selectedOptionIds, setSelectedOptionIds] = useState<Record<string, string[]>>({});
-  const [isSubmitting, setIsSubmitting] = useState(false);
-
-  useEffect(() => {
-    async function loadQuiz() {
-      try {
-        const response = await fetch(`/api/quizzes/${id}`);
-        if (!response.ok) {
-          throw new Error(`Failed to fetch: ${response.status}`);
-        }
-        const data = await response.json();
-        setQuiz(data.quiz);
-      } catch (error) {
-        console.error(error);
-      }
-    }
-    loadQuiz();
-  }, [id]);
-
-  function updateSelectedOptionIds(
-    questionId: string,
-    optionId: string,
-    isChecked: boolean,
-  ) {
-    setSelectedOptionIds((currentSelectedOptionIds) => {
-      const currentSelectedOptionIdsInQuestion = currentSelectedOptionIds[questionId] ?? [];
-      const nextSelectedOptionIdsInQuestion = new Set(currentSelectedOptionIdsInQuestion);
-
-      if (isChecked) {
-        nextSelectedOptionIdsInQuestion.add(optionId);
-      } else {
-        nextSelectedOptionIdsInQuestion.delete(optionId);
-      }
-
-      return {
-        ...currentSelectedOptionIds,
-        [questionId]: Array.from(nextSelectedOptionIdsInQuestion),
-      };
-    });
+  if (!user) {
+    redirect("/auth/login");
   }
 
-  async function handleSubmit() {
-    setIsSubmitting(true);
-    try {
-      const selectedOptions = Object.entries(selectedOptionIds).flatMap(
-        ([question_id, option_ids]) =>
-          option_ids.map((option_id) =>
-            ({ question_id, option_id })
-          )
-      );
+  const { data, error } = await supabase
+    .from("quizzes")
+    .select(
+      `title,
+       questions:questions(
+         id,
+         question,
+         options:options!options_question_id_fkey(
+           id,
+           option
+         )
+       )`,
+    )
+    .eq("id", params.id)
+    .eq("user_id", user.id)
+    .single();
 
-      const response = await fetch("/api/quiz_sessions", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          quiz_id: id,
-          selected_options: selectedOptions,
-        }),
-      });
-
-      if (!response.ok) {
-        const data = await response.json().catch(() => ({}));
-        throw new Error(data?.error || `Request failed: ${response.status}`);
-      }
-
-      const data = await response.json();
-      router.push(`/quizzes/${id}/quiz_sessions/${data.id}`);
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setIsSubmitting(false);
-    }
+  if (error?.code === "PGRST116") {
+    notFound();
   }
 
-  return (
-    <div className="container mx-auto max-w-3xl p-6">
-      <h1 className="text-3xl font-bold mb-6"><MathText text={quiz.title} /></h1>
-      <div className="space-y-6 pb-4">
-        {quiz.questions.map((question, questionIndex) => (
-          <Card key={question.id}>
-            <CardHeader>
-              <CardTitle className="text-xl">
-                <span className="mr-2">{questionIndex + 1}.</span>
-                <MathText text={question.question} />
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                {question.options.map((option) => {
-                  return (
-                    <div key={option.id} className="flex items-center gap-3">
-                      <Checkbox
-                        id={option.id}
-                        checked={(selectedOptionIds[question.id] ?? []).includes(option.id)}
-                        onCheckedChange={(isChecked) =>
-                          updateSelectedOptionIds(question.id, option.id, Boolean(isChecked))
-                        }
-                      />
-                      <Label htmlFor={option.id} className="cursor-pointer">
-                        <MathText text={option.option} />
-                      </Label>
-                    </div>
-                  );
-                })}
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+  if (error) {
+    throw new Error(error.message);
+  }
 
-      <div className="sticky bottom-0 left-0 right-0 bg-background/90 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="container mx-auto max-w-3xl flex items-center justify-between gap-4 p-4">
-          <Button onClick={handleSubmit} disabled={isSubmitting}>
-            {isSubmitting ? "Submitting…" : "Submit"}
-          </Button>
-        </div>
-      </div>
-    </div>
-  );
+  if (!data) {
+    notFound();
+  }
+
+  const quiz = data as Quiz;
+
+  return <StartQuizSession quizId={params.id} quiz={quiz} />;
 }

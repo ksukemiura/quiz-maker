@@ -1,11 +1,7 @@
-"use client";
-
-import {
-  use,
-  useEffect,
-  useState,
-} from "react";
 import Link from "next/link";
+import { notFound, redirect } from "next/navigation";
+
+import MathText from "@/components/MathText";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -14,62 +10,88 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import type { Tables } from "@/database.types";
-import MathText from "@/components/MathText";
+import { createClient } from "@/lib/supabase/server";
 
 type Option = Pick<
   Tables<"options">,
-  "option"
+  "id" |
+  "option" |
+  "is_correct"
 >;
 
 type Question = Pick<
   Tables<"questions">,
+  "id" |
   "question"
 > & {
   options: Option[];
 };
 
-type Quiz = Pick<
-  Tables<"quizzes">,
-  "title"
-> & {
+type Quiz = Pick<Tables<"quizzes">, "title"> & {
   questions: Question[];
 };
 
-export default function Page({
+export default async function Page({
   params,
 }: {
-  params: Promise<{ id: string }>;
+  params: { id: string };
 }) {
-  const { id } = use(params);
-  const [quiz, setQuiz] = useState<Quiz>({ title: "", questions: [] });
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
-  useEffect(() => {
-    async function loadQuiz() {
-      try {
-        const response = await fetch(`/api/quizzes/${id}`);
-        if (!response.ok) {
-          throw new Error(`Failed to fetch: ${response.status}`);
-        }
-        const data = await response.json();
-        setQuiz(data.quiz);
-      } catch (error) {
-        console.error(error);
-      }
-    }
-    loadQuiz();
-  }, [id]);
+  if (!user) {
+    redirect("/auth/login");
+  }
+
+  const { data, error } = await supabase
+    .from("quizzes")
+    .select(
+      `title,
+       questions:questions(
+         id,
+         question,
+         options:options!options_question_id_fkey(
+           id,
+           option,
+           is_correct
+         )
+       )`,
+    )
+    .eq("id", params.id)
+    .eq("user_id", user.id)
+    .single();
+
+  if (error?.code === "PGRST116") {
+    notFound();
+  }
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  if (!data) {
+    notFound();
+  }
+
+  const quiz = data as Quiz;
 
   return (
     <div className="mx-auto max-w-3xl p-6">
       <div className="mb-6 flex items-center justify-between gap-4">
-        <h1 className="text-3xl font-bold"><MathText text={quiz.title} /></h1>
+        <h1 className="text-3xl font-bold">
+          <MathText text={quiz.title} />
+        </h1>
         <Button asChild>
-          <Link href={`/quizzes/${id}/quiz_sessions/new`}>Start Quiz</Link>
+          <Link href={`/quizzes/${params.id}/quiz_sessions/new`}>
+            Start Quiz
+          </Link>
         </Button>
       </div>
       <div className="space-y-6">
         {quiz.questions.map((question, questionIndex) => (
-          <Card key={questionIndex}>
+          <Card key={question.id}>
             <CardHeader>
               <CardTitle className="text-xl">
                 <span className="mr-2">{questionIndex + 1}.</span>
@@ -79,11 +101,13 @@ export default function Page({
             <CardContent>
               <ul className="space-y-2">
                 {question.options.map((option, optionIndex) => (
-                  <li key={optionIndex} className="flex items-center gap-3">
+                  <li key={option.id} className="flex items-center gap-3">
                     <span className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-gray-100 text-sm font-medium text-gray-700">
                       {optionIndex + 1}
                     </span>
-                    <span><MathText text={option.option} /></span>
+                    <span>
+                      <MathText text={option.option} />
+                    </span>
                   </li>
                 ))}
               </ul>
