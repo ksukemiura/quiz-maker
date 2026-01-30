@@ -18,6 +18,30 @@ type Segment =
   | { type: "text"; value: string }
   | { type: "math"; value: string; display: boolean };
 
+type CurrencyMap = Record<string, string>;
+
+const currencyPattern = /\$(\d[\d,]*(?:\.\d+)?)(?![A-Za-z])/g;
+
+function protectCurrency(input: string): { text: string; map: CurrencyMap } {
+  const map: CurrencyMap = {};
+  let index = 0;
+  const text = input.replace(currencyPattern, (match) => {
+    const key = `__CURRENCY_${index}__`;
+    map[key] = match;
+    index += 1;
+    return key;
+  });
+  return { text, map };
+}
+
+function restoreCurrency(input: string, map: CurrencyMap): string {
+  let output = input;
+  for (const [key, value] of Object.entries(map)) {
+    output = output.replaceAll(key, value);
+  }
+  return output;
+}
+
 function splitMath(input: string): Segment[] {
   const segments: Segment[] = [];
   let i = 0;
@@ -110,13 +134,18 @@ export function MathText({ text, display, className }: MathTextProps) {
     return <div className={className} dangerouslySetInnerHTML={{ __html }} />;
   }
 
-  const segments = splitMath(text);
+  const { text: protectedText, map: currencyMap } = protectCurrency(text);
+  const segments = splitMath(protectedText);
 
   return (
     <span className={className}>
       {segments.map((seg, idx) => {
         if (seg.type === "text") {
-          return <React.Fragment key={idx}>{seg.value}</React.Fragment>;
+          return (
+            <React.Fragment key={idx}>
+              {restoreCurrency(seg.value, currencyMap)}
+            </React.Fragment>
+          );
         }
         const __html = katex.renderToString(seg.value, {
           displayMode: seg.display,
@@ -135,4 +164,3 @@ export function MathText({ text, display, className }: MathTextProps) {
 }
 
 export default MathText;
-
